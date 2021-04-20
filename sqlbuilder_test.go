@@ -22,38 +22,38 @@ func TestEscapeStr(t *testing.T) {
 		},
 		{
 			name: "backslash",
-			args: args{s: `ab` + string(BACKSLASH) + `c`},
-			want: `ab\` + string(BACKSLASH) + `c`,
+			args: args{s: `ab` + string(Backslash) + `c`},
+			want: `ab\` + string(Backslash) + `c`,
 		},
 		{
 			name: "null byte",
-			args: args{s: `ab` + string(ASCII_NULL) + `c`},
-			want: `ab\` + string(ASCII_NULL) + `c`,
+			args: args{s: `ab` + string(AsciiNull) + `c`},
+			want: `ab\` + string(AsciiNull) + `c`,
 		},
 		{
 			name: "CARRIAGE_RETURN",
-			args: args{s: `ab` + string(CARRIAGE_RETURN) + `c`},
-			want: `ab\` + string(CARRIAGE_RETURN) + `c`,
+			args: args{s: `ab` + string(CarriageReturn) + `c`},
+			want: `ab\` + string(CarriageReturn) + `c`,
 		},
 		{
 			name: "NEW_LINE",
-			args: args{s: `ab` + string(NEW_LINE) + `c`},
-			want: `ab\` + string(NEW_LINE) + `c`,
+			args: args{s: `ab` + string(NewLine) + `c`},
+			want: `ab\` + string(NewLine) + `c`,
 		},
 		{
 			name: "CTRL_Z",
-			args: args{s: `ab` + string(CTRL_Z) + `c`},
-			want: `ab\` + string(CTRL_Z) + `c`,
+			args: args{s: `ab` + string(CtrlZ) + `c`},
+			want: `ab\` + string(CtrlZ) + `c`,
 		},
 		{
 			name: "SINGLE_QUOTE",
-			args: args{s: `ab` + string(SINGLE_QUOTE) + `c`},
-			want: `ab\` + string(SINGLE_QUOTE) + `c`,
+			args: args{s: `ab` + string(SingleQuote) + `c`},
+			want: `ab\` + string(SingleQuote) + `c`,
 		},
 		{
 			name: "DOUBLE_QUOTE",
-			args: args{s: `ab` + string(DOUBLE_QUOTE) + `c`},
-			want: `ab\` + string(DOUBLE_QUOTE) + `c`,
+			args: args{s: `ab` + string(DoubleQuote) + `c`},
+			want: `ab\` + string(DoubleQuote) + `c`,
 		},
 	}
 	for _, tt := range tests {

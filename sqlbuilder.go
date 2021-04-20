@@ -8,13 +8,13 @@ import (
 )
 
 const (
-	BACKSLASH       = '\\'
-	ASCII_NULL      = '\x00'
-	CARRIAGE_RETURN = '\r'
-	NEW_LINE        = '\n'
-	CTRL_Z          = '\x1A'
-	SINGLE_QUOTE    = '\''
-	DOUBLE_QUOTE    = '"'
+	Backslash      = '\\'
+	AsciiNull      = '\x00'
+	CarriageReturn = '\r'
+	NewLine        = '\n'
+	CtrlZ          = '\x1A'
+	SingleQuote    = '\''
+	DoubleQuote    = '"'
 )
 
 //https://mariadb.com/kb/en/server-system-variables/#max_allowed_packet
@@ -32,26 +32,26 @@ func EscapeStr(s string) string {
 			break
 		}
 		switch r {
-		case BACKSLASH:
-			out.WriteRune(BACKSLASH)
+		case Backslash:
+			out.WriteRune(Backslash)
 			out.WriteRune(r)
-		case ASCII_NULL:
-			out.WriteRune(BACKSLASH)
+		case AsciiNull:
+			out.WriteRune(Backslash)
 			out.WriteRune(r)
-		case CARRIAGE_RETURN:
-			out.WriteRune(BACKSLASH)
+		case CarriageReturn:
+			out.WriteRune(Backslash)
 			out.WriteRune(r)
-		case NEW_LINE:
-			out.WriteRune(BACKSLASH)
+		case NewLine:
+			out.WriteRune(Backslash)
 			out.WriteRune(r)
-		case CTRL_Z:
-			out.WriteRune(BACKSLASH)
+		case CtrlZ:
+			out.WriteRune(Backslash)
 			out.WriteRune(r)
-		case SINGLE_QUOTE:
-			out.WriteRune(BACKSLASH)
+		case SingleQuote:
+			out.WriteRune(Backslash)
 			out.WriteRune(r)
-		case DOUBLE_QUOTE:
-			out.WriteRune(BACKSLASH)
+		case DoubleQuote:
+			out.WriteRune(Backslash)
 			out.WriteRune(r)
 		default:
 			out.WriteRune(r)
@@ -60,13 +60,13 @@ func EscapeStr(s string) string {
 	return out.String()
 }
 
-func QueriesBuild(data [][]string, tblname string, maxallowpack int) (queries []string, err error) {
-	if maxallowpack < MINALLOWEDPACKETLEN {
+func QueriesBuild(data [][]string, tblname string, maxallowedpack int) (queries []string, err error) {
+	if maxallowedpack < MINALLOWEDPACKETLEN {
 		err = errors.New("max_allowed_packet can't be less than 1024")
 		return nil, err
 	}
 	// test MAXALLOWEDPACKETLEN
-	if maxallowpack > MAXALLOWEDPACKETLEN {
+	if maxallowedpack > MAXALLOWEDPACKETLEN {
 		err = errors.New("max_allowed_packet is too big")
 		return nil, err
 	}
@@ -80,8 +80,8 @@ func QueriesBuild(data [][]string, tblname string, maxallowpack int) (queries []
 	outsql := &strings.Builder{}
 	outsql.WriteString(SQLQuery)
 	outsql.WriteString(RowBuild(data[0]))
-	if outsql.Len() > maxallowpack {
-		err = fmt.Errorf("query is too big - max_allowed_packet limit is %d", maxallowpack)
+	if outsql.Len() > maxallowedpack {
+		err = fmt.Errorf("query is too big - max_allowed_packet limit is %d", maxallowedpack)
 		return nil, err
 	}
 	// all data processed - nothing todo
@@ -91,7 +91,7 @@ func QueriesBuild(data [][]string, tblname string, maxallowpack int) (queries []
 	}
 	for i := 1; i < len(data); i++ {
 		r := RowBuild(data[i])
-		if (outsql.Len() + len(r) + 1) >= maxallowpack {
+		if (outsql.Len() + len(r) + 1) >= maxallowedpack {
 			queries = append(queries, outsql.String())
 			outsql.Reset()
 			outsql.WriteString(SQLQuery)
