@@ -60,7 +60,10 @@ func EscapeStr(s string) string {
 	return out.String()
 }
 
-func QueriesBuild(data [][]string, tblname string, maxallowedpack int) (queries []string, err error) {
+func QueriesBuild(
+	data [][]string,
+	querytemplate string,
+	maxallowedpack int) (queries []string, err error) {
 	if maxallowedpack < MINALLOWEDPACKETLEN {
 		err = errors.New("max_allowed_packet can't be less than 1024")
 		return nil, err
@@ -70,13 +73,12 @@ func QueriesBuild(data [][]string, tblname string, maxallowedpack int) (queries 
 		err = errors.New("max_allowed_packet is too big")
 		return nil, err
 	}
-	// nothing todo
+	// nothing to do
 	if len(data) == 0 {
 		err = errors.New("data is empty")
 		return nil, err
 	}
-	tblname = "`" + tblname + "`"
-	SQLQuery := "REPLACE INTO " + tblname + " VALUES "
+	SQLQuery := querytemplate + " "
 	outsql := &strings.Builder{}
 	outsql.WriteString(SQLQuery)
 	outsql.WriteString(RowBuild(data[0]))
@@ -84,7 +86,7 @@ func QueriesBuild(data [][]string, tblname string, maxallowedpack int) (queries 
 		err = fmt.Errorf("query is too big - max_allowed_packet limit is %d", maxallowedpack)
 		return nil, err
 	}
-	// all data processed - nothing todo
+	// all data processed - nothing to do
 	if len(data) == 1 {
 		queries = append(queries, outsql.String())
 		return
