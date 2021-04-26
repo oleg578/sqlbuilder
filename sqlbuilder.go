@@ -23,7 +23,7 @@ const (
 	MAXALLOWEDPACKETLEN = 1073741824
 )
 
-func EscapeStr(s string) string {
+func escapeStr(s string) string {
 	in := strings.NewReader(s)
 	out := strings.Builder{}
 	for {
@@ -81,7 +81,7 @@ func QueriesBuild(
 	SQLQuery := querytemplate + " "
 	outsql := &strings.Builder{}
 	outsql.WriteString(SQLQuery)
-	outsql.WriteString(RowBuild(data[0]))
+	outsql.WriteString(rowBuild(data[0]))
 	if outsql.Len() > maxallowedpack {
 		err = fmt.Errorf("query is too big - max_allowed_packet limit is %d", maxallowedpack)
 		return nil, err
@@ -92,29 +92,29 @@ func QueriesBuild(
 		return
 	}
 	for i := 1; i < len(data); i++ {
-		r := RowBuild(data[i])
+		r := rowBuild(data[i])
 		if (outsql.Len() + len(r) + 1) >= maxallowedpack {
 			queries = append(queries, outsql.String())
 			outsql.Reset()
 			outsql.WriteString(SQLQuery)
-			outsql.WriteString(RowBuild(data[i]))
+			outsql.WriteString(rowBuild(data[i]))
 		}
 		outsql.WriteString(",")
-		outsql.WriteString(RowBuild(data[i]))
+		outsql.WriteString(rowBuild(data[i]))
 	}
 	queries = append(queries, outsql.String())
 	return
 }
 
-func RowBuild(inslc []string) string {
+func rowBuild(inslc []string) string {
 	if len(inslc) == 0 {
 		return ""
 	}
 	wr := &strings.Builder{}
-	wr.WriteString("('" + EscapeStr(inslc[0]) + "'")
+	wr.WriteString("('" + escapeStr(inslc[0]) + "'")
 	for _, r := range inslc[1:] {
 		wr.WriteString(",'")
-		wr.WriteString(EscapeStr(r))
+		wr.WriteString(escapeStr(r))
 		wr.WriteString("'")
 	}
 	wr.WriteString(")")
