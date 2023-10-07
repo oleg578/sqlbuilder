@@ -58,7 +58,7 @@ func TestEscapeStr(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := EscapeStr(tt.args.s); got != tt.want {
+			if got := escapeStr(tt.args.s); got != tt.want {
 				t.Errorf("EscapeStr() = %v, want %v", got, tt.want)
 			}
 		})
@@ -194,7 +194,7 @@ func TestQueriesBuild(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotQueries, err := QueriesBuild(tt.args.data, tt.args.tblname, tt.args.maxallowpack)
+			gotQueries, err := QueriesBuild(tt.args.data, tt.args.tblname, uint64(tt.args.maxallowpack))
 			if (err != nil) && tt.wantErr {
 				if err.Error() != tt.estimateErr.Error() {
 					t.Errorf("QueriesBuild() error = %v, estimateErr %v", err, tt.estimateErr)
@@ -235,7 +235,7 @@ func TestRowBuild(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := RowBuild(tt.args.inslc); got != tt.want {
+			if got := rowBuild(tt.args.inslc); got != tt.want {
 				t.Errorf("RowBuild() = %v, want %v", got, tt.want)
 			}
 		})
