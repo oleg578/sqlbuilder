@@ -58,7 +58,7 @@ func QueriesBuild(
 	data [][]string,
 	querytemplate string,
 	maxallowedpack uint64) (queries []string, err error) {
-	// nothing to do
+	// if data is empty we can't do anything and return error
 	if len(data) == 0 {
 		err = errors.New("data is empty")
 		return nil, err
