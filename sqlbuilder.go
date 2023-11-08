@@ -17,12 +17,6 @@ const (
 	DoubleQuote    = '"'
 )
 
-// https://mariadb.com/kb/en/server-system-variables/#max_allowed_packet
-const (
-	MINALLOWEDPACKETLEN = 1024
-	MAXALLOWEDPACKETLEN = 1073741824
-)
-
 func escapeStr(s string) string {
 	in := strings.NewReader(s)
 	out := strings.Builder{}
@@ -64,15 +58,6 @@ func QueriesBuild(
 	data [][]string,
 	querytemplate string,
 	maxallowedpack uint64) (queries []string, err error) {
-	if maxallowedpack < MINALLOWEDPACKETLEN {
-		err = errors.New("max_allowed_packet can't be less than 1024")
-		return nil, err
-	}
-	// test MAXALLOWEDPACKETLEN
-	if maxallowedpack > MAXALLOWEDPACKETLEN {
-		err = errors.New("max_allowed_packet is too big")
-		return nil, err
-	}
 	// nothing to do
 	if len(data) == 0 {
 		err = errors.New("data is empty")
