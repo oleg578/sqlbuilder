@@ -84,18 +84,16 @@ func QueriesBuild(
 	}
 	// build all queries from 1st element
 	for i := 1; i < len(data); i++ {
-		r, errRowBuild := rowBuild(data[i])
+		rowString, errRowBuild := rowBuild(data[i])
 		if errRowBuild != nil {
 			return nil, errRowBuild
 		}
-		if uint64(outValuesString.Len()+len(r)+1) >= maxallowedpack {
-			queries = append(queries, outValuesString.String())
-			outValuesString.Reset()
-			outValuesString.WriteString(SQLQuery)
-			outValuesString.WriteString(rowBuild(data[i]))
+		if uint64(outValuesString.Len()+len(rowString)+1) > maxallowedpack {
+			err = fmt.Errorf("query is too big - max_allowed_packet limit is %d", maxallowedpack)
+			return nil, err
 		}
 		outValuesString.WriteString(",")
-		outValuesString.WriteString(rowBuild(data[i]))
+		outValuesString.WriteString(rowString)
 	}
 	queries = append(queries, outValuesString.String())
 	return
