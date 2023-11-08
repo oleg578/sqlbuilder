@@ -91,17 +91,25 @@ func QueriesBuild(
 	return
 }
 
-func rowBuild(inslc []string) string {
+func quoteStr(s string) string {
+	return "'" + escapeStr(s) + "'"
+}
+
+func rowBuild(inslc []string) (string, error) {
 	if len(inslc) == 0 {
-		return ""
+		return "", errors.New("empty data")
 	}
 	wr := &strings.Builder{}
-	wr.WriteString("('" + escapeStr(inslc[0]) + "'")
+	//open parenthesis
+	wr.WriteString("(")
+	// add a first element, escaped and quoted
+	wr.WriteString(quoteStr(escapeStr(inslc[0])))
+	// add all other elements, escaped and quoted
 	for _, r := range inslc[1:] {
-		wr.WriteString(",'")
-		wr.WriteString(escapeStr(r))
-		wr.WriteString("'")
+		wr.WriteString(",")
+		wr.WriteString(quoteStr(escapeStr(r)))
 	}
+	// close parenthesis
 	wr.WriteString(")")
-	return wr.String()
+	return wr.String(), nil
 }
