@@ -58,36 +58,46 @@ func QueriesBuild(
 	data [][]string,
 	querytemplate string,
 	maxallowedpack uint64) (queries []string, err error) {
-	// if data is empty we can't do anything and return error
+	// if data is empty, we can't do anything and return error
 	if len(data) == 0 {
-		err = errors.New("data is empty")
+		err = errors.New("data is empty - nothing to build")
 		return nil, err
 	}
+	// add space at the end of query
 	SQLQuery := querytemplate + " "
-	outsql := &strings.Builder{}
-	outsql.WriteString(SQLQuery)
-	outsql.WriteString(rowBuild(data[0]))
-	if uint64(outsql.Len()) > maxallowedpack {
+	outValuesString := &strings.Builder{}
+	outValuesString.WriteString(SQLQuery)
+	preparedValue, errPreparedValue := rowBuild(data[0])
+	if errPreparedValue != nil {
+		return nil, errPreparedValue
+	}
+	outValuesString.WriteString(preparedValue)
+	//check if a query is too big
+	if uint64(outValuesString.Len()) > maxallowedpack {
 		err = fmt.Errorf("query is too big - max_allowed_packet limit is %d", maxallowedpack)
 		return nil, err
 	}
 	// all data processed - nothing to do
 	if len(data) == 1 {
-		queries = append(queries, outsql.String())
-		return
+		queries = append(queries, outValuesString.String())
+		return queries, nil
 	}
+	// build all queries from 1st element
 	for i := 1; i < len(data); i++ {
-		r := rowBuild(data[i])
-		if uint64(outsql.Len()+len(r)+1) >= maxallowedpack {
-			queries = append(queries, outsql.String())
-			outsql.Reset()
-			outsql.WriteString(SQLQuery)
-			outsql.WriteString(rowBuild(data[i]))
+		r, errRowBuild := rowBuild(data[i])
+		if errRowBuild != nil {
+			return nil, errRowBuild
 		}
-		outsql.WriteString(",")
-		outsql.WriteString(rowBuild(data[i]))
+		if uint64(outValuesString.Len()+len(r)+1) >= maxallowedpack {
+			queries = append(queries, outValuesString.String())
+			outValuesString.Reset()
+			outValuesString.WriteString(SQLQuery)
+			outValuesString.WriteString(rowBuild(data[i]))
+		}
+		outValuesString.WriteString(",")
+		outValuesString.WriteString(rowBuild(data[i]))
 	}
-	queries = append(queries, outsql.String())
+	queries = append(queries, outValuesString.String())
 	return
 }
 
@@ -97,7 +107,7 @@ func quoteStr(s string) string {
 
 func rowBuild(inslc []string) (string, error) {
 	if len(inslc) == 0 {
-		return "", errors.New("empty data")
+		return "", errors.New("row can't be built from empty data")
 	}
 	wr := &strings.Builder{}
 	//open parenthesis
