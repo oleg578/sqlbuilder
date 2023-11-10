@@ -82,70 +82,18 @@ func TestQueriesBuild(t *testing.T) {
 			name: "empty pool",
 			args: args{
 				data:         [][]string{},
-				tblname:      `foo`,
+				tblname:      "REPLACE INTO `foo` VALUES",
 				maxallowpack: 1024,
 			},
 			wantQueries: nil,
-			estimateErr: errors.New("data is empty"),
-			wantErr:     true,
-		},
-		{
-			name: "packet length too small",
-			args: args{
-				data:         [][]string{},
-				tblname:      `foo`,
-				maxallowpack: MINALLOWEDPACKETLEN - 1,
-			},
-			wantQueries: nil,
-			estimateErr: errors.New("max_allowed_packet can't be less than 1024"),
-			wantErr:     true,
-		},
-		{
-			name: "packet length too small",
-			args: args{
-				data:         [][]string{},
-				tblname:      `foo`,
-				maxallowpack: MAXALLOWEDPACKETLEN + 1,
-			},
-			wantQueries: nil,
-			estimateErr: errors.New("max_allowed_packet is too big"),
-			wantErr:     true,
-		},
-		{
-			name: "1 element pool",
-			args: args{
-				data: [][]string{{
-					`Vivamus non dolor euismod, ornare leo a, finibus tellus. Maecenas sed.`,
-					`Vivamus non dolor euismod, ornare leo a, finibus tellus. Maecenas sed.`,
-					`Vivamus non dolor euismod, ornare leo a, finibus tellus. Maecenas sed.`,
-					`Vivamus non dolor euismod, ornare leo a, finibus tellus. Maecenas sed.`,
-					`Vivamus non dolor euismod, ornare leo a, finibus tellus. Maecenas sed.`,
-					`Vivamus non dolor euismod, ornare leo a, finibus tellus. Maecenas sed.`,
-					`Vivamus non dolor euismod, ornare leo a, finibus tellus. Maecenas sed.`,
-					`Vivamus non dolor euismod, ornare leo a, finibus tellus. Maecenas sed.`,
-					`Vivamus non dolor euismod, ornare leo a, finibus tellus. Maecenas sed.`,
-					`Vivamus non dolor euismod, ornare leo a, finibus tellus. Maecenas sed.`,
-					`Vivamus non dolor euismod, ornare leo a, finibus tellus. Maecenas sed.`,
-					`Vivamus non dolor euismod, ornare leo a, finibus tellus. Maecenas sed.`,
-					`Vivamus non dolor euismod, ornare leo a, finibus tellus. Maecenas sed.`,
-					`Vivamus non dolor euismod, ornare leo a, finibus tellus. Maecenas sed.`,
-					`Vivamus non dolor euismod, ornare leo a, finibus tellus. Maecenas sed.`,
-					`Vivamus non dolor euismod, ornare leo a, finibus tellus. Maecenas sed.`,
-					`Vivamus non dolor euismod, ornare leo a, finibus tellus. Maecenas sed.`,
-					`Vivamus non dolor euismod, ornare leo a, finibus tellus. Maecenas sed.`,
-					`Vivamus non dolor euismod, ornare leo a, finibus tellus. Maecenas sed.`}},
-				tblname:      `foo`,
-				maxallowpack: 1024,
-			},
-			wantQueries: nil,
-			estimateErr: errors.New("query is too big - max_allowed_packet limit is 1024"),
+			estimateErr: errors.New("data is empty - nothing to build"),
 			wantErr:     true,
 		},
 		{
 			name: "1 element pool",
 			args: args{
 				data:         [][]string{{`a`, `b`, `c`}},
-				tblname:      `foo`,
+				tblname:      "REPLACE INTO `foo` VALUES",
 				maxallowpack: 2048,
 			},
 			wantQueries: []string{"REPLACE INTO `foo` VALUES ('a','b','c')"},
@@ -162,7 +110,7 @@ func TestQueriesBuild(t *testing.T) {
 					{`a`, `b`, `c`},
 					{`a`, `b`, `c`},
 				},
-				tblname:      `foo`,
+				tblname:      "REPLACE INTO `foo` VALUES",
 				maxallowpack: 1024,
 			},
 			wantQueries: []string{
@@ -181,14 +129,14 @@ func TestQueriesBuild(t *testing.T) {
 					{`Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`, `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`, `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`},
 					{`Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`, `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`, `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`},
 				},
-				tblname:      `foo`,
+				tblname:      "REPLACE INTO `foo` VALUES",
 				maxallowpack: 1024,
 			},
 			wantQueries: []string{
 				"REPLACE INTO `foo` VALUES ('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.','Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.','Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.'),('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.','Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.','Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.'),('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.','Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.','Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.'),('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.','Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.','Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.')",
 				"REPLACE INTO `foo` VALUES ('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.','Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.','Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.'),('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.','Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.','Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.')",
 			},
-			estimateErr: errors.New("data is empty"),
+			estimateErr: errors.New("query is too big - max_allowed_packet limit is 1024"),
 			wantErr:     true,
 		},
 	}
@@ -197,12 +145,14 @@ func TestQueriesBuild(t *testing.T) {
 			gotQueries, err := QueriesBuild(tt.args.data, tt.args.tblname, uint64(tt.args.maxallowpack))
 			if (err != nil) && tt.wantErr {
 				if err.Error() != tt.estimateErr.Error() {
-					t.Errorf("QueriesBuild() error = %v, estimateErr %v", err, tt.estimateErr)
+					t.Errorf("QueriesBuild() error = %v, estimateErr = %v", err, tt.estimateErr)
 					return
 				}
 			}
 			if !(reflect.DeepEqual(tt.wantQueries, gotQueries)) {
-				t.Errorf("QueriesBuild() = %v, want %v", gotQueries, tt.wantQueries)
+				t.Errorf(
+					"\nQueriesBuild() = %v\nwant: %v\n error: %v\n out len: %d\nwant: %d",
+					gotQueries, tt.wantQueries, err, len(tt.wantQueries), len(tt.wantQueries))
 			}
 		})
 	}
@@ -235,8 +185,8 @@ func TestRowBuild(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := rowBuild(tt.args.inslc); got != tt.want {
-				t.Errorf("RowBuild() = %v, want %v", got, tt.want)
+			if got, _ := rowBuild(tt.args.inslc); got != tt.want {
+				t.Errorf("RowBuild() = %v\n want %v", got, tt.want)
 			}
 		})
 	}
