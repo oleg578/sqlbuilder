@@ -72,9 +72,10 @@ func QueriesBuild(
 		return nil, errPreparedValue
 	}
 	outValuesString.WriteString(preparedValue)
-	//check if a query is too big
+	//check if query length limit is reached
 	if uint64(outValuesString.Len()) > maxallowedpack {
-		err = fmt.Errorf("query is too big - max_allowed_packet limit is %d", maxallowedpack)
+		err = fmt.Errorf(
+			"%d = query is too big - max_allowed_packet limit is %d", outValuesString.Len(), maxallowedpack)
 		return nil, err
 	}
 	// all data processed - nothing to do
@@ -88,9 +89,11 @@ func QueriesBuild(
 		if errRowBuild != nil {
 			return nil, errRowBuild
 		}
-		if uint64(outValuesString.Len()+len(rowString)+1) > maxallowedpack {
-			err = fmt.Errorf("query is too big - max_allowed_packet limit is %d", maxallowedpack)
-			return nil, err
+		if uint64(outValuesString.Len()+len(rowString)+1) >= maxallowedpack {
+			queries = append(queries, outValuesString.String())
+			outValuesString.Reset()
+			outValuesString.WriteString(SQLQuery)
+			outValuesString.WriteString(rowString)
 		}
 		outValuesString.WriteString(",")
 		outValuesString.WriteString(rowString)
