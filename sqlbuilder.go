@@ -72,7 +72,7 @@ func QueriesBuild(
 		return nil, errPreparedValue
 	}
 	outValuesString.WriteString(preparedValue)
-	//check if query length limit is reached
+	//check if the query length limit is reached
 	if uint64(outValuesString.Len()) > maxallowedpack {
 		err = fmt.Errorf(
 			"query is too big - maxallowedpacket is %d", maxallowedpack)
