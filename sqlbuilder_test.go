@@ -120,6 +120,36 @@ func TestQueriesBuild(t *testing.T) {
 			wantErr:     true,
 		},
 		{
+			name: "rowBuild error - empty data in first slice",
+			args: args{
+				data: [][]string{
+					{},
+					{`a`, `b`, `c`},
+					{`a`, `b`, `c`},
+				},
+				tblname:      "REPLACE INTO `foo` VALUES",
+				maxallowpack: 1024,
+			},
+			wantQueries: nil,
+			estimateErr: errors.New("row can't be built from empty data"),
+			wantErr:     true,
+		},
+		{
+			name: "rowBuild error - empty data in non first slice",
+			args: args{
+				data: [][]string{
+					{`a`, `b`, `c`},
+					{},
+					{`a`, `b`, `c`},
+				},
+				tblname:      "REPLACE INTO `foo` VALUES",
+				maxallowpack: 1024,
+			},
+			wantQueries: nil,
+			estimateErr: errors.New("row can't be built from empty data"),
+			wantErr:     true,
+		},
+		{
 			name: "long pool",
 			args: args{
 				data: [][]string{
@@ -137,6 +167,23 @@ func TestQueriesBuild(t *testing.T) {
 				"REPLACE INTO `foo` VALUES ('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.','Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.','Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.'),('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.','Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.','Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.')",
 			},
 			estimateErr: errors.New("query is too big - max_allowed_packet limit is 1024"),
+			wantErr:     true,
+		},
+		{
+			name: "too muh small allowed packet",
+			args: args{
+				data: [][]string{
+					{`Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`, `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`, `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`},
+					{`Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`, `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`, `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`},
+					{`Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`, `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`, `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`},
+					{`Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`, `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`, `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`},
+					{`Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`, `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`, `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`},
+				},
+				tblname:      "REPLACE INTO `foo` VALUES",
+				maxallowpack: 32,
+			},
+			wantQueries: nil,
+			estimateErr: errors.New("query is too big - maxallowedpacket is 32"),
 			wantErr:     true,
 		},
 	}
