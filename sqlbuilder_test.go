@@ -16,7 +16,7 @@ func TestEscapeStr(t *testing.T) {
 		want string
 	}{
 		{
-			name: "text without escape",
+			name: "default - text without escape",
 			args: args{s: "abc"},
 			want: "abc",
 		},
@@ -178,7 +178,7 @@ func TestRowBuild(t *testing.T) {
 			want: "('a')",
 		},
 		{
-			name: "some element slice",
+			name: "several element slice",
 			args: args{inslc: []string{`a`, `b`, `c`}},
 			want: "('a','b','c')",
 		},
