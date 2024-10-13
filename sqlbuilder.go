@@ -56,8 +56,8 @@ func escapeStr(s string) string {
 
 func QueriesBuild(
 	data [][]string,
-	querytemplate string,
-	maxallowedpack uint64,
+	queryTemplate string,
+	maxAllowedPack uint64,
 ) (queries []string, err error) {
 	// if data is empty, we can't do anything and return error
 	if len(data) == 0 {
@@ -65,7 +65,7 @@ func QueriesBuild(
 		return nil, err
 	}
 	// add space at the end of query
-	SQLQuery := querytemplate + " "
+	SQLQuery := queryTemplate + " "
 	outValuesString := &strings.Builder{}
 	outValuesString.WriteString(SQLQuery)
 	preparedValue, errPreparedValue := rowBuild(data[0])
@@ -74,9 +74,9 @@ func QueriesBuild(
 	}
 	outValuesString.WriteString(preparedValue)
 	// check if the query length limit is reached
-	if uint64(outValuesString.Len()) > maxallowedpack {
+	if uint64(outValuesString.Len()) > maxAllowedPack {
 		err = fmt.Errorf(
-			"query is too big - maxallowedpacket is %d", maxallowedpack)
+			"query is too big - maxallowedpacket is %d", maxAllowedPack)
 		return nil, err
 	}
 	// all data processed - nothing to do
@@ -90,7 +90,7 @@ func QueriesBuild(
 		if errRowBuild != nil {
 			return nil, errRowBuild
 		}
-		if uint64(outValuesString.Len()+len(rowString)+1) >= maxallowedpack {
+		if uint64(outValuesString.Len()+len(rowString)+1) >= maxAllowedPack {
 			queries = append(queries, outValuesString.String())
 			outValuesString.Reset()
 			outValuesString.WriteString(SQLQuery)
