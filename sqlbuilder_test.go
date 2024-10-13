@@ -68,8 +68,8 @@ func TestEscapeStr(t *testing.T) {
 func TestQueriesBuild(t *testing.T) {
 	type args struct {
 		data         [][]string
-		tblname      string
-		maxallowpack int
+		tblName      string
+		maxAllowPack int
 	}
 	tests := []struct {
 		name        string
@@ -82,8 +82,8 @@ func TestQueriesBuild(t *testing.T) {
 			name: "empty pool",
 			args: args{
 				data:         [][]string{},
-				tblname:      "REPLACE INTO `foo` VALUES",
-				maxallowpack: 1024,
+				tblName:      "REPLACE INTO `foo` VALUES",
+				maxAllowPack: 1024,
 			},
 			wantQueries: nil,
 			estimateErr: errors.New("data is empty - nothing to build"),
@@ -93,8 +93,8 @@ func TestQueriesBuild(t *testing.T) {
 			name: "1 element pool",
 			args: args{
 				data:         [][]string{{`a`, `b`, `c`}},
-				tblname:      "REPLACE INTO `foo` VALUES",
-				maxallowpack: 2048,
+				tblName:      "REPLACE INTO `foo` VALUES",
+				maxAllowPack: 2048,
 			},
 			wantQueries: []string{"REPLACE INTO `foo` VALUES ('a','b','c')"},
 			estimateErr: nil,
@@ -110,8 +110,8 @@ func TestQueriesBuild(t *testing.T) {
 					{`a`, `b`, `c`},
 					{`a`, `b`, `c`},
 				},
-				tblname:      "REPLACE INTO `foo` VALUES",
-				maxallowpack: 1024,
+				tblName:      "REPLACE INTO `foo` VALUES",
+				maxAllowPack: 1024,
 			},
 			wantQueries: []string{
 				"REPLACE INTO `foo` VALUES ('a','b','c'),('a','b','c'),('a','b','c'),('a','b','c'),('a','b','c')",
@@ -127,8 +127,8 @@ func TestQueriesBuild(t *testing.T) {
 					{`a`, `b`, `c`},
 					{`a`, `b`, `c`},
 				},
-				tblname:      "REPLACE INTO `foo` VALUES",
-				maxallowpack: 1024,
+				tblName:      "REPLACE INTO `foo` VALUES",
+				maxAllowPack: 1024,
 			},
 			wantQueries: nil,
 			estimateErr: errors.New("row can't be built from empty data"),
@@ -142,8 +142,8 @@ func TestQueriesBuild(t *testing.T) {
 					{},
 					{`a`, `b`, `c`},
 				},
-				tblname:      "REPLACE INTO `foo` VALUES",
-				maxallowpack: 1024,
+				tblName:      "REPLACE INTO `foo` VALUES",
+				maxAllowPack: 1024,
 			},
 			wantQueries: nil,
 			estimateErr: errors.New("row can't be built from empty data"),
@@ -159,8 +159,8 @@ func TestQueriesBuild(t *testing.T) {
 					{`Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`, `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`, `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`},
 					{`Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`, `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`, `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`},
 				},
-				tblname:      "REPLACE INTO `foo` VALUES",
-				maxallowpack: 1024,
+				tblName:      "REPLACE INTO `foo` VALUES",
+				maxAllowPack: 1024,
 			},
 			wantQueries: []string{
 				"REPLACE INTO `foo` VALUES ('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.','Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.','Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.'),('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.','Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.','Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.'),('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.','Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.','Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.'),('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.','Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.','Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.')",
@@ -179,8 +179,8 @@ func TestQueriesBuild(t *testing.T) {
 					{`Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`, `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`, `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`},
 					{`Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`, `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`, `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec metus.`},
 				},
-				tblname:      "REPLACE INTO `foo` VALUES",
-				maxallowpack: 32,
+				tblName:      "REPLACE INTO `foo` VALUES",
+				maxAllowPack: 32,
 			},
 			wantQueries: nil,
 			estimateErr: errors.New("query is too big - maxallowedpacket is 32"),
@@ -189,7 +189,7 @@ func TestQueriesBuild(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotQueries, err := QueriesBuild(tt.args.data, tt.args.tblname, uint64(tt.args.maxallowpack))
+			gotQueries, err := QueriesBuild(tt.args.data, tt.args.tblName, uint64(tt.args.maxAllowPack))
 			if (err != nil) && tt.wantErr {
 				if err.Error() != tt.estimateErr.Error() {
 					t.Errorf("QueriesBuild() error = %v, estimateErr = %v", err, tt.estimateErr)
