@@ -68,6 +68,7 @@ func QueriesBuild(
 	SQLQuery := queryTemplate + " "
 	outValuesString := &strings.Builder{}
 	outValuesString.WriteString(SQLQuery)
+	outValuesString.WriteString(" ")
 	preparedValue, errPreparedValue := rowBuild(data[0])
 	if errPreparedValue != nil {
 		return nil, errPreparedValue
@@ -107,17 +108,17 @@ func quoteStr(s string) string {
 	return "'" + escapeStr(s) + "'"
 }
 
-func rowBuild(inslc []string) (string, error) {
-	if len(inslc) == 0 {
-		return "", errors.New("row can't be built from empty data")
+func rowBuild(strs []string) (string, error) {
+	if len(strs) == 0 {
+		return "", errors.New("empty data")
 	}
 	wr := &strings.Builder{}
 	// open parenthesis
 	wr.WriteString("(")
 	// add a first element, escaped and quoted
-	wr.WriteString(quoteStr(escapeStr(inslc[0])))
+	wr.WriteString(quoteStr(escapeStr(strs[0])))
 	// add all other elements, escaped and quoted
-	for _, r := range inslc[1:] {
+	for _, r := range strs[1:] {
 		wr.WriteString(",")
 		wr.WriteString(quoteStr(escapeStr(r)))
 	}
