@@ -61,7 +61,7 @@ func QueriesBuild(
 ) (queries []string, err error) {
 	// if data is empty, we can't do anything and return error
 	if len(data) == 0 {
-		err = errors.New("data is empty - nothing to build")
+		err = errors.New("empty data")
 		return nil, err
 	}
 	// add space at the end of query
