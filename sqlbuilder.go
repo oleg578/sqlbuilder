@@ -57,7 +57,8 @@ func escapeStr(s string) string {
 func QueriesBuild(
 	data [][]string,
 	querytemplate string,
-	maxallowedpack uint64) (queries []string, err error) {
+	maxallowedpack uint64,
+) (queries []string, err error) {
 	// if data is empty, we can't do anything and return error
 	if len(data) == 0 {
 		err = errors.New("data is empty - nothing to build")
@@ -72,7 +73,7 @@ func QueriesBuild(
 		return nil, errPreparedValue
 	}
 	outValuesString.WriteString(preparedValue)
-	//check if the query length limit is reached
+	// check if the query length limit is reached
 	if uint64(outValuesString.Len()) > maxallowedpack {
 		err = fmt.Errorf(
 			"query is too big - maxallowedpacket is %d", maxallowedpack)
@@ -111,7 +112,7 @@ func rowBuild(inslc []string) (string, error) {
 		return "", errors.New("row can't be built from empty data")
 	}
 	wr := &strings.Builder{}
-	//open parenthesis
+	// open parenthesis
 	wr.WriteString("(")
 	// add a first element, escaped and quoted
 	wr.WriteString(quoteStr(escapeStr(inslc[0])))
