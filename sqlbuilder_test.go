@@ -86,7 +86,7 @@ func TestQueriesBuild(t *testing.T) {
 				maxAllowPack: 1024,
 			},
 			wantQueries: nil,
-			estimateErr: errors.New("data is empty - nothing to build"),
+			estimateErr: errors.New("empty data"),
 			wantErr:     true,
 		},
 		{
@@ -131,7 +131,7 @@ func TestQueriesBuild(t *testing.T) {
 				maxAllowPack: 1024,
 			},
 			wantQueries: nil,
-			estimateErr: errors.New("row can't be built from empty data"),
+			estimateErr: errors.New("empty data"),
 			wantErr:     true,
 		},
 		{
@@ -146,7 +146,7 @@ func TestQueriesBuild(t *testing.T) {
 				maxAllowPack: 1024,
 			},
 			wantQueries: nil,
-			estimateErr: errors.New("row can't be built from empty data"),
+			estimateErr: errors.New("empty data"),
 			wantErr:     true,
 		},
 		{
@@ -183,7 +183,7 @@ func TestQueriesBuild(t *testing.T) {
 				maxAllowPack: 32,
 			},
 			wantQueries: nil,
-			estimateErr: errors.New("query is too big - maxallowedpacket is 32"),
+			estimateErr: errors.New("query is too big - maxAllowedPacket is 32"),
 			wantErr:     true,
 		},
 	}
