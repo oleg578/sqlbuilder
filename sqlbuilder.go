@@ -68,7 +68,6 @@ func QueriesBuild(
 	SQLQuery := queryTemplate + " "
 	outValuesString := &strings.Builder{}
 	outValuesString.WriteString(SQLQuery)
-	outValuesString.WriteString(" ")
 	preparedValue, errPreparedValue := rowBuild(data[0])
 	if errPreparedValue != nil {
 		return nil, errPreparedValue
