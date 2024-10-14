@@ -2,7 +2,6 @@ package sqlbuilder
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"strings"
 )
@@ -15,6 +14,11 @@ const (
 	CtrlZ          = '\x1A'
 	SingleQuote    = '\''
 	DoubleQuote    = '"'
+)
+
+const (
+	EmptyData   = "empty data"
+	TooBigQuery = "query is too big"
 )
 
 func escapeStr(s string) string {
@@ -61,8 +65,7 @@ func QueriesBuild(
 ) (queries []string, err error) {
 	// if data is empty, we can't do anything and return error
 	if len(data) == 0 {
-		err = errors.New("empty data")
-		return nil, err
+		return nil, errors.New(EmptyData)
 	}
 	// add space at the end of query
 	SQLQuery := queryTemplate + " "
@@ -75,9 +78,7 @@ func QueriesBuild(
 	outValuesString.WriteString(preparedValue)
 	// check if the query length limit is reached
 	if uint64(outValuesString.Len()) > maxAllowedPack {
-		err = fmt.Errorf(
-			"query is too big - maxallowedpacket is %d", maxAllowedPack)
-		return nil, err
+		return nil, errors.New(TooBigQuery)
 	}
 	// all data processed - nothing to do
 	if len(data) == 1 {
@@ -109,7 +110,7 @@ func quoteStr(s string) string {
 
 func rowBuild(strs []string) (string, error) {
 	if len(strs) == 0 {
-		return "", errors.New("empty data")
+		return "", errors.New(EmptyData)
 	}
 	wr := &strings.Builder{}
 	// open parenthesis
