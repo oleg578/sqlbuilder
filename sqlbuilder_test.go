@@ -86,7 +86,7 @@ func TestQueriesBuild(t *testing.T) {
 				maxAllowPack: 1024,
 			},
 			wantQueries: nil,
-			estimateErr: errors.New("empty data"),
+			estimateErr: errors.New(EmptyData),
 			wantErr:     true,
 		},
 		{
@@ -116,7 +116,7 @@ func TestQueriesBuild(t *testing.T) {
 			wantQueries: []string{
 				"REPLACE INTO `foo` VALUES ('a','b','c'),('a','b','c'),('a','b','c'),('a','b','c'),('a','b','c')",
 			},
-			estimateErr: errors.New("data is empty"),
+			estimateErr: errors.New(EmptyData),
 			wantErr:     true,
 		},
 		{
@@ -131,7 +131,7 @@ func TestQueriesBuild(t *testing.T) {
 				maxAllowPack: 1024,
 			},
 			wantQueries: nil,
-			estimateErr: errors.New("empty data"),
+			estimateErr: errors.New(EmptyData),
 			wantErr:     true,
 		},
 		{
@@ -146,7 +146,7 @@ func TestQueriesBuild(t *testing.T) {
 				maxAllowPack: 1024,
 			},
 			wantQueries: nil,
-			estimateErr: errors.New("empty data"),
+			estimateErr: errors.New(EmptyData),
 			wantErr:     true,
 		},
 		{
@@ -183,7 +183,7 @@ func TestQueriesBuild(t *testing.T) {
 				maxAllowPack: 32,
 			},
 			wantQueries: nil,
-			estimateErr: errors.New("query is too big - maxAllowedPacket is 32"),
+			estimateErr: errors.New(TooBigQuery),
 			wantErr:     true,
 		},
 	}
