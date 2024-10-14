@@ -18,7 +18,7 @@ const (
 
 const (
 	EmptyData   = "empty data"
-	TooBigQuery = "query is too big"
+	TooBigQuery = "maxAllowedPack exceeded"
 )
 
 func escapeStr(s string) string {
