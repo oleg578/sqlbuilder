@@ -18,6 +18,7 @@ func main() {
 	if errDb != nil {
 		panic(errDb)
 	}
+	defer db.Close()
 
 	conn, errConn := db.Conn(ctx)
 	if errConn != nil {
