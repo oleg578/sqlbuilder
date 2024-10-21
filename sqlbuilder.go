@@ -2,6 +2,7 @@ package sqlbuilder
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"strings"
 )
@@ -58,49 +59,46 @@ func escapeStr(s string) string {
 	return out.String()
 }
 
-func QueriesBuild(
-	data [][]string,
-	queryTemplate string,
-	maxAllowedPack uint64,
-) (queries []string, err error) {
-	// if data is empty, we can't do anything and return error
+func QueriesBuild(data [][]string, tbl string, mxp uint64) (queries []string, err error) {
+	qTmpl := fmt.Sprintf("INSERT INTO %s VALUES", tbl)
+	mxp-- // some magic :) may be the reason is '\n' in protocol
+	// nothing to do
 	if len(data) == 0 {
 		return nil, errors.New(EmptyData)
 	}
-	// add space at the end of query
-	SQLQuery := queryTemplate + " "
-	outValuesString := &strings.Builder{}
-	outValuesString.WriteString(SQLQuery)
-	preparedValue, errPreparedValue := rowBuild(data[0])
+	// too small maxAllowedPack
+	if uint64(len(qTmpl)) >= mxp {
+		return nil, errors.New(TooBigQuery)
+	}
+	qStr := &strings.Builder{}
+	qStr.WriteString(qTmpl)
+	values, errPreparedValue := rowBuild(data[0])
 	if errPreparedValue != nil {
 		return nil, errPreparedValue
 	}
-	outValuesString.WriteString(preparedValue)
-	// check if the query length limit is reached
-	if uint64(outValuesString.Len()) > maxAllowedPack {
+	qStr.WriteString(values)
+	if uint64(qStr.Len()) > mxp {
 		return nil, errors.New(TooBigQuery)
-	}
-	// all data processed - nothing to do
-	if len(data) == 1 {
-		queries = append(queries, outValuesString.String())
-		return queries, nil
 	}
 	// build all queries from 1st element
 	for i := 1; i < len(data); i++ {
-		rowString, errRowBuild := rowBuild(data[i])
+		if len(data[i]) == 0 {
+			continue // skip empty
+		}
+		rowStr, errRowBuild := rowBuild(data[i])
 		if errRowBuild != nil {
 			return nil, errRowBuild
 		}
-		if uint64(outValuesString.Len()+len(rowString)+1) >= maxAllowedPack {
-			queries = append(queries, outValuesString.String())
-			outValuesString.Reset()
-			outValuesString.WriteString(SQLQuery)
-			outValuesString.WriteString(rowString)
+		if uint64(qStr.Len()+len(rowStr)+1) >= mxp {
+			queries = append(queries, qStr.String())
+			qStr.Reset()
+			qStr.WriteString(qTmpl + rowStr)
+			continue
 		}
-		outValuesString.WriteString(",")
-		outValuesString.WriteString(rowString)
+		qStr.WriteString(",")
+		qStr.WriteString(rowStr)
 	}
-	queries = append(queries, outValuesString.String())
+	queries = append(queries, qStr.String())
 	return
 }
 
