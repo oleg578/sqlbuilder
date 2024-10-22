@@ -93,7 +93,7 @@ func TestQueriesBuild(t *testing.T) {
 			name: "1 element pool",
 			args: args{
 				data:         [][]string{{`a`, `b`, `c`}},
-				tblName:      "`foo`",
+				tblName:      "foo",
 				maxAllowPack: 2048,
 			},
 			wantQueries: []string{"INSERT INTO `foo` VALUES('a','b','c')"},
@@ -110,7 +110,7 @@ func TestQueriesBuild(t *testing.T) {
 					{`4`, `product`, `description`},
 					{`5`, `product`, `description`},
 				},
-				tblName:      "`foo`",
+				tblName:      "foo",
 				maxAllowPack: 128,
 			},
 			wantQueries: []string{
@@ -128,7 +128,7 @@ func TestQueriesBuild(t *testing.T) {
 					{},
 					{`3`, `b`, `c`},
 				},
-				tblName:      "`foo`",
+				tblName:      "foo",
 				maxAllowPack: 1024,
 			},
 			wantQueries: []string{
