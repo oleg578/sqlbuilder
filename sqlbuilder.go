@@ -60,7 +60,7 @@ func escapeStr(s string) string {
 }
 
 func QueriesBuild(data [][]string, tbl string, mxp uint64) (queries []string, err error) {
-	qTmpl := fmt.Sprintf("INSERT INTO %s VALUES", tbl)
+	qTmpl := fmt.Sprintf("INSERT INTO `%s` VALUES", tbl)
 	mxp-- // some magic :) may be the reason is '\n' in protocol
 	// nothing to do
 	if len(data) == 0 {
