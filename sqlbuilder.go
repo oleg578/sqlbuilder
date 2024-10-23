@@ -59,11 +59,11 @@ func escapeStr(s string) string {
 	return out.String()
 }
 
-func QueriesBuild(data [][]string, tbl string, mxp uint64) (queries []string, err error) {
+func QueriesBuild(data *[][]string, tbl string, mxp uint64) (queries []string, err error) {
 	qTmpl := fmt.Sprintf("INSERT INTO `%s` VALUES", tbl)
 	mxp-- // some magic :) may be the reason is '\n' in protocol
 	// nothing to do
-	if len(data) == 0 {
+	if len(*data) == 0 {
 		return nil, errors.New(EmptyData)
 	}
 	// too small maxAllowedPack
@@ -72,20 +72,11 @@ func QueriesBuild(data [][]string, tbl string, mxp uint64) (queries []string, er
 	}
 	qStr := &strings.Builder{}
 	qStr.WriteString(qTmpl)
-	values, errPreparedValue := rowBuild(&data[0])
-	if errPreparedValue != nil {
-		return nil, errPreparedValue
-	}
-	qStr.WriteString(values)
-	if uint64(qStr.Len()) > mxp {
-		return nil, errors.New(TooBigQuery)
-	}
-	// build all queries from 1st element
-	for i := 1; i < len(data); i++ {
-		if len(data[i]) == 0 {
+	for _, d := range *data {
+		if len(d) == 0 {
 			continue // skip empty
 		}
-		rowStr, errRowBuild := rowBuild(&data[i])
+		rowStr, errRowBuild := rowBuild(&d)
 		if errRowBuild != nil {
 			return nil, errRowBuild
 		}
@@ -95,8 +86,13 @@ func QueriesBuild(data [][]string, tbl string, mxp uint64) (queries []string, er
 			qStr.WriteString(qTmpl + rowStr)
 			continue
 		}
-		qStr.WriteString(",")
+		if qStr.Len() > len(qTmpl) { // skip add comma on first values string
+			qStr.WriteString(",")
+		}
 		qStr.WriteString(rowStr)
+		if uint64(qStr.Len()) >= mxp {
+			return nil, errors.New(TooBigQuery)
+		}
 	}
 	queries = append(queries, qStr.String())
 	return

@@ -140,7 +140,7 @@ func TestQueriesBuild(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotQueries, err := QueriesBuild(tt.args.data, tt.args.tblName, uint64(tt.args.maxAllowPack))
+			gotQueries, err := QueriesBuild(&tt.args.data, tt.args.tblName, uint64(tt.args.maxAllowPack))
 			if (err != nil) && tt.wantErr {
 				if err.Error() != tt.estimateErr.Error() {
 					t.Errorf("QueriesBuild() error = %v, estimateErr = %v", err, tt.estimateErr)
