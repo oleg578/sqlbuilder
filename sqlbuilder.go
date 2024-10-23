@@ -72,7 +72,7 @@ func QueriesBuild(data [][]string, tbl string, mxp uint64) (queries []string, er
 	}
 	qStr := &strings.Builder{}
 	qStr.WriteString(qTmpl)
-	values, errPreparedValue := rowBuild(data[0])
+	values, errPreparedValue := rowBuild(&data[0])
 	if errPreparedValue != nil {
 		return nil, errPreparedValue
 	}
@@ -85,7 +85,7 @@ func QueriesBuild(data [][]string, tbl string, mxp uint64) (queries []string, er
 		if len(data[i]) == 0 {
 			continue // skip empty
 		}
-		rowStr, errRowBuild := rowBuild(data[i])
+		rowStr, errRowBuild := rowBuild(&data[i])
 		if errRowBuild != nil {
 			return nil, errRowBuild
 		}
@@ -106,18 +106,18 @@ func quoteStr(s string) string {
 	return "'" + escapeStr(s) + "'"
 }
 
-func rowBuild(strs []string) (string, error) {
-	if len(strs) == 0 {
+func rowBuild(strs *[]string) (string, error) {
+	if len(*strs) == 0 {
 		return "", errors.New(EmptyData)
 	}
 	wr := &strings.Builder{}
 	// open parenthesis
 	wr.WriteString("(")
-	// add a first element, escaped and quoted
-	wr.WriteString(quoteStr(escapeStr(strs[0])))
 	// add all other elements, escaped and quoted
-	for _, r := range strs[1:] {
-		wr.WriteString(",")
+	for i, r := range *strs {
+		if i > 0 {
+			wr.WriteString(",")
+		}
 		wr.WriteString(quoteStr(escapeStr(r)))
 	}
 	// close parenthesis
