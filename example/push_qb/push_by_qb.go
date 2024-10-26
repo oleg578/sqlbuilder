@@ -34,7 +34,7 @@ func main() {
 		panic(errCr)
 	}
 	q := "dummy_2"
-	queries, errQ := sqlbuilder.QueriesBuild(records, q, MAXALLOWEDPACKET)
+	queries, errQ := sqlbuilder.QueriesBuild(&records, q, MAXALLOWEDPACKET)
 
 	if errQ != nil {
 		panic(errQ)
